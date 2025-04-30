@@ -1,0 +1,149 @@
+{% extends 'solutions/base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="h4 mb-0">{% if idea %}Edit{% else %}Submit{% endif %} Your Idea</h2>
+                </div>
+                <div class="card-body">
+                    <form id="ideaForm" method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   value="{{ idea.title|default:'' }}" required>
+                            <div class="invalid-feedback">Please provide a title for your idea.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category</label>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="">Select a category</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}" 
+                                        {% if idea and idea.category_id == category.id %}selected{% endif %}>
+                                        {{ category.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">Please select a category.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" required>
+                                {{ idea.description|default:'' }}
+                            </textarea>
+                            <div class="invalid-feedback">Please provide a description.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Location</label>
+                            <div id="map" class="mb-2"></div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" id="latitude" name="latitude" 
+                                           placeholder="Latitude" readonly required value="{{ idea.latitude|default:'' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" id="longitude" name="longitude" 
+                                           placeholder="Longitude" readonly required value="{{ idea.longitude|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="invalid-feedback">Please select a location on the map.</div>
+                        </div>
+                        <div class="d-grid">
+                            <a href="{% url 'solutions:idea_list' %}" class="btn btn-outline-secondary me-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                {% if idea %}Update{% else %}Submit{% endif %} Idea
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        // Initialize map
+        const map = L.map('map').setView([12.9716, 77.5946], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: ' OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+
+        let marker = null;
+        const latitudeInput = document.getElementById('latitude');
+        const longitudeInput = document.getElementById('longitude');
+        const form = document.getElementById('ideaForm');
+
+        // Handle map clicks
+        map.on('click', function(e) {
+            const lat = e.latlng.lat.toFixed(6);
+            const lng = e.latlng.lng.toFixed(6);
+
+            if (marker) {
+                marker.setLatLng(e.latlng);
+            } else {
+                marker = L.marker(e.latlng).addTo(map);
+            }
+
+            latitudeInput.value = lat;
+            longitudeInput.value = lng;
+        });
+
+        {% if idea and idea.latitude and idea.longitude %}
+            marker = L.marker([{{ idea.latitude }}, {{ idea.longitude }}]).addTo(map);
+            map.setView([{{ idea.latitude }}, {{ idea.longitude }}], 13);
+        {% endif %}
+
+        // Form validation
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            const title = document.getElementById('title');
+            const category = document.getElementById('category');
+            const description = document.getElementById('description');
+
+            if (!title.value.trim()) {
+                title.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                title.classList.remove('is-invalid');
+            }
+
+            if (!category.value) {
+                category.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                category.classList.remove('is-invalid');
+            }
+
+            if (!description.value.trim()) {
+                description.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                description.classList.remove('is-invalid');
+            }
+
+            if (!latitudeInput.value || !longitudeInput.value) {
+                document.getElementById('map').classList.add('border', 'border-danger');
+                isValid = false;
+            } else {
+                document.getElementById('map').classList.remove('border', 'border-danger');
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+    } catch (error) {
+        console.error('Error occurred while initializing the map or handling form submission:', error);
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,48 @@
+# Suggested Images for Your SmartCity Solutions Presentation
+
+## For Title Slide
+- Modern city skyline with digital elements or overlays
+- Smart city concept art showing connected urban infrastructure
+
+## For Feature Slides
+- Screenshots from your application:
+  - Home page showing the latest ideas
+  - Idea submission form with the map interface
+  - Idea detail page showing comments and votes
+  - User profile page
+  - Admin dashboard with charts
+
+## For Architecture Slide
+- Simple diagram showing:
+  - Django backend
+  - Bootstrap/HTML/CSS frontend
+  - Database
+  - Map integration
+  - User interfaces
+
+## For Process/Workflow Slides
+- Simple flowchart showing the idea lifecycle from submission to implementation
+- Icons representing different statuses (pending, approved, in progress, completed)
+
+## For Data Visualization Slide
+- Actual screenshots of your admin dashboard charts
+- If not available, create sample pie/bar charts showing:
+  - Ideas by category
+  - Implementation status distribution
+
+## For Mobile Responsiveness
+- Side-by-side comparison of desktop vs mobile view
+
+## Background Elements
+- Light blue gradients matching your site's primary color (#2563eb)
+- Simple geometric patterns or city-themed line art
+- Subtle grid patterns representing connectivity
+
+## Tips for Visual Consistency
+- Use the same font family as your application (Inter)
+- Maintain your color scheme throughout:
+  - Primary: #2563eb (blue)
+  - Secondary: #475569 (slate)
+  - Success: #22c55e (green)
+  - Background: #f8fafc (light gray)
+- Use icons from Bootstrap Icons library for consistency with your app

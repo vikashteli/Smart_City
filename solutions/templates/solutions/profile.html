@@ -1,0 +1,117 @@
+{% extends 'solutions/base.html' %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3 class="card-title">Profile</h3>
+                <p class="card-text">
+                    <strong>Username:</strong> {{ user.username }}<br>
+                    <strong>Member since:</strong> {{ user.date_joined|date:"F d, Y" }}<br>
+                    <strong>Ideas submitted:</strong> {{ user_ideas.count }}<br>
+                    <strong>Ideas voted:</strong> {{ voted_ideas.count }}
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="ideas-tab" data-bs-toggle="tab" 
+                        data-bs-target="#ideas" type="button" role="tab">
+                    My Ideas
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="voted-tab" data-bs-toggle="tab" 
+                        data-bs-target="#voted" type="button" role="tab">
+                    Voted Ideas
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="profileTabsContent">
+            <div class="tab-pane fade show active" id="ideas" role="tabpanel">
+                {% if user_ideas %}
+                    {% for idea in user_ideas %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title">{{ idea.title }}</h5>
+                                        <p class="text-muted mb-2">
+                                            <small>
+                                                {{ idea.created_at|date:"M d, Y" }} | 
+                                                {{ idea.category.name }} |
+                                                {{ idea.vote_set.count }} vote{{ idea.vote_set.count|pluralize }}
+                                            </small>
+                                        </p>
+                                    </div>
+                                    <span class="badge bg-{{ idea.status|yesno:'success,warning,danger' }}">
+                                        {{ idea.get_status_display }}
+                                    </span>
+                                </div>
+                                
+                                <p class="card-text">{{ idea.description|truncatewords:30 }}</p>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="bi bi-geo-alt"></i> {{ idea.location }}
+                                    </small>
+                                    <div>
+                                        <a href="{% url 'solutions:idea_edit' idea.pk %}" 
+                                           class="btn btn-outline-secondary btn-sm me-2">
+                                            Edit
+                                        </a>
+                                        <a href="{% url 'solutions:idea_detail' idea.pk %}" 
+                                           class="btn btn-primary btn-sm">
+                                            View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">
+                        You haven't submitted any ideas yet. 
+                        <a href="{% url 'solutions:idea_create' %}">Submit your first idea!</a>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="tab-pane fade" id="voted" role="tabpanel">
+                {% if voted_ideas %}
+                    {% for idea in voted_ideas %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ idea.title }}</h5>
+                                <p class="text-muted mb-2">
+                                    <small>
+                                        By {{ idea.author.username }} | 
+                                        {{ idea.created_at|date:"M d, Y" }} | 
+                                        {{ idea.category.name }}
+                                    </small>
+                                </p>
+                                <p class="card-text">{{ idea.description|truncatewords:30 }}</p>
+                                <a href="{% url 'solutions:idea_detail' idea.pk %}" 
+                                   class="btn btn-outline-primary btn-sm">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">
+                        You haven't voted on any ideas yet. 
+                        <a href="{% url 'solutions:idea_list' %}">Browse ideas to vote!</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
